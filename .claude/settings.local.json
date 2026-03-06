@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan migrate:fresh --seed)",
+      "Bash(php artisan storage:link)",
+      "Bash(php artisan config:clear)",
+      "Bash(php artisan route:list --path=events)",
+      "Bash(php -r \":*)",
+      "Bash(php artisan optimize:clear)",
+      "Bash(php artisan tinker --execute=\":*)",
+      "Bash(php -r \"echo sys_get_temp_dir\\(\\);\")",
+      "Bash(php -r \"echo ini_get\\(''upload_tmp_dir''\\);\")",
+      "Bash(php artisan make:middleware CheckNotBlocked)",
+      "Bash(php \"c:/Users/Bohdan/Projects/meetbase/artisan\" make:migration rename_draft_to_hidden_in_events --path=database/migrations)",
+      "Bash(php \"c:/Users/Bohdan/Projects/meetbase/artisan\" migrate)",
+      "Bash(php \"c:/Users/Bohdan/Projects/meetbase/artisan\" migrate:rollback --step=1)",
+      "Bash(php \"c:/Users/Bohdan/Projects/meetbase/artisan\" make:migration rename_draft_to_pending_in_events)",
+      "Bash(node -e \":*)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\Bohdan\\Projects\\meetbase"
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        DB::table('events')->where('status', 'draft')->update(['status' => 'hidden']);
+    }
+
+    public function down(): void
+    {
+        DB::table('events')->where('status', 'hidden')->update(['status' => 'draft']);
+    }
+};
