@@ -4,12 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Registration;
-use BaconQrCode\Renderer\Image\SvgImageBackEnd;
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-use BaconQrCode\Writer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Stripe\Stripe;
+use Stripe\PaymentIntent;
 
 class PaymentController extends Controller
 {
@@ -28,23 +26,50 @@ class PaymentController extends Controller
             return redirect()->route('events.show', $event)->with('error', 'Ви вже зареєстровані.');
         }
 
-        return view('payment.show', compact('event'));
-    }
+        Stripe::setApiKey(config('services.stripe.secret'));
 
-    public function process(Request $request, Event $event)
-    {
-        if ($event->isPast()) {
-            return redirect()->route('events.show', $event)->with('error', 'Реєстрація закрита — захід вже завершився.');
-        }
-
-        $request->validate([
-            'card_number' => 'required|digits:16',
-            'card_name'   => 'required|string',
-            'expiry'      => 'required|string',
-            'cvv'         => 'required|digits:3',
+        $intent = PaymentIntent::create([
+            'amount'   => (int) ($event->price * 100), // в копійках
+            'currency' => 'uah',
+            'metadata' => [
+                'event_id' => $event->id,
+                'user_id'  => auth()->id(),
+            ],
         ]);
 
-        // Mock: завжди успішна оплата
+        return view('payment.show', [
+            'event'         => $event,
+            'clientSecret'  => $intent->client_secret,
+            'stripeKey'     => config('services.stripe.key'),
+        ]);
+    }
+
+    public function confirm(Request $request, Event $event)
+    {
+        $request->validate([
+            'payment_intent_id' => 'required|string|starts_with:pi_',
+        ]);
+
+        if ($event->isPast()) {
+            return back()->with('error', 'Реєстрація закрита — захід вже завершився.');
+        }
+
+        Stripe::setApiKey(config('services.stripe.secret'));
+
+        $intent = PaymentIntent::retrieve($request->payment_intent_id);
+
+        if ($intent->status !== 'succeeded') {
+            return back()->with('error', 'Платіж не підтверджено. Спробуйте ще раз.');
+        }
+
+        // Додаткова перевірка: PaymentIntent справді для цього заходу і цього юзера
+        if (
+            (int) $intent->metadata->event_id !== $event->id ||
+            (int) $intent->metadata->user_id  !== auth()->id()
+        ) {
+            abort(403);
+        }
+
         $registration = Registration::updateOrCreate(
             ['event_id' => $event->id, 'user_id' => auth()->id()],
             [

@@ -46,7 +46,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Оплата
     Route::get('/payment/{event:slug}', [PaymentController::class, 'show'])->name('payment.show');
-    Route::post('/payment/{event:slug}', [PaymentController::class, 'process'])->name('payment.process');
+    Route::post('/payment/{event:slug}/confirm', [PaymentController::class, 'confirm'])->name('payment.confirm');
 
     // Кабінет організатора
     Route::middleware('role:organizer,admin')->prefix('organizer')->name('organizer.')->group(function () {
