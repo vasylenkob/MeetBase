@@ -19,11 +19,10 @@
                     </div>
                 @endif
 
-                {{-- Stripe card element --}}
+                {{-- Stripe payment element --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">Дані картки</label>
-                    <div id="card-element"
-                         class="bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 min-h-[44px]"></div>
+                    <div id="payment-element" class="min-h-[44px]"></div>
                     <p id="card-error" class="mt-2 text-sm text-red-400 hidden"></p>
                 </div>
 
@@ -64,6 +63,7 @@
         const stripe = Stripe('{{ $stripeKey }}');
 
         const elements = stripe.elements({
+            clientSecret: '{{ $clientSecret }}',
             appearance: {
                 theme: 'night',
                 variables: {
@@ -77,8 +77,10 @@
             },
         });
 
-        const cardElement = elements.create('card');
-        cardElement.mount('#card-element');
+        const paymentElement = elements.create('payment', {
+            wallets: { link: 'never' },
+        });
+        paymentElement.mount('#payment-element');
 
         const payBtn    = document.getElementById('pay-btn');
         const payLabel  = document.getElementById('pay-label');
@@ -101,17 +103,18 @@
             setLoading(true);
             cardError.classList.add('hidden');
 
-            const { error, paymentIntent } = await stripe.confirmCardPayment(
-                '{{ $clientSecret }}',
-                { payment_method: { card: cardElement } }
-            );
+            const { error, paymentIntent } = await stripe.confirmPayment({
+                elements,
+                confirmParams: { return_url: window.location.href },
+                redirect: 'if_required',
+            });
 
             if (error) {
                 showError(error.message);
                 return;
             }
 
-            if (paymentIntent.status === 'succeeded') {
+            if (paymentIntent && paymentIntent.status === 'succeeded') {
                 document.getElementById('payment-intent-id').value = paymentIntent.id;
                 document.getElementById('confirm-form').submit();
             } else {

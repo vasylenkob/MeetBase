@@ -15,8 +15,7 @@ class EventController extends Controller
     {
         $query = Event::with(['category', 'organizer'])
             ->published()
-            ->upcoming()
-            ->orderBy('starts_at');
+            ->orderByDesc('starts_at');
 
         if ($request->filled('category')) {
             $query->whereHas('category', fn($q) => $q->where('slug', $request->category));

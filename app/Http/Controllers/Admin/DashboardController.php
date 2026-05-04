@@ -23,7 +23,7 @@ class DashboardController extends Controller
         ];
 
         $latestEvents = Event::with(['organizer', 'category'])
-            ->orderByDesc('created_at')
+            ->orderByDesc('starts_at')
             ->take(5)
             ->get();
 

@@ -32,7 +32,7 @@ new class extends Component {
             'comments' => $this->event->comments()
                 ->where('status', 'approved')
                 ->with('user')
-                ->oldest()
+                ->latest()
                 ->paginate(10),
 
             'ownPendingComment' => auth()->check()

@@ -250,7 +250,7 @@ class DatabaseSeeder extends Seeder
             Comment::create([
                 'event_id'   => $demoEvent->id,
                 'user_id'    => $users[$i % 3]->id,
-                'body'       => $fakeBodies[$i % count($fakeBodies)] . ' (#' . $i . ')',
+                'body'       => $fakeBodies[$i % count($fakeBodies)],
                 'status'     => 'approved',
                 'created_at' => now()->subMinutes(97 - $i),
                 'updated_at' => now()->subMinutes(97 - $i),

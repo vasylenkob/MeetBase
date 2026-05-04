@@ -62,12 +62,12 @@
 
     {{-- Upcoming events --}}
     @php
-        $upcomingEvents = \App\Models\Event::with('category')->published()->upcoming()->orderBy('starts_at')->take(6)->get();
+        $upcomingEvents = \App\Models\Event::with('category')->published()->orderByDesc('starts_at')->take(6)->get();
     @endphp
 
     <section class="max-w-7xl mx-auto px-4 py-14">
         <div class="flex items-center justify-between mb-8">
-            <h2 class="text-2xl font-bold text-white">Найближчі заходи</h2>
+            <h2 class="text-2xl font-bold text-white">Нещодавні заходи</h2>
             <a href="{{ route('events.index') }}" class="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition">
                 Всі заходи →
             </a>

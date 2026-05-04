@@ -28,9 +28,11 @@ new class extends Component
                     </x-nav-link>
 
                     @auth
+                        @if(!auth()->user()->isAdmin())
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
                             Кабінет
                         </x-nav-link>
+                        @endif
 
                         @if(auth()->user()->isOrganizer() || auth()->user()->isAdmin())
                             <x-nav-link :href="route('organizer.events')" :active="request()->routeIs('organizer.*')" wire:navigate>
@@ -95,7 +97,9 @@ new class extends Component
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('events.index')" wire:navigate>Заходи</x-responsive-nav-link>
             @auth
+                @if(!auth()->user()->isAdmin())
                 <x-responsive-nav-link :href="route('dashboard')" wire:navigate>Кабінет</x-responsive-nav-link>
+                @endif
                 @if(auth()->user()->isOrganizer() || auth()->user()->isAdmin())
                     <x-responsive-nav-link :href="route('organizer.events')" wire:navigate>Мої заходи</x-responsive-nav-link>
                 @endif

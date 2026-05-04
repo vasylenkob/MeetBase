@@ -143,22 +143,21 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        document.addEventListener('alpine:initialized', function () {
+        document.addEventListener('DOMContentLoaded', function () {
             const isOnline = {{ old('is_online', $event->is_online) ? 'true' : 'false' }};
             if (isOnline) return;
 
             const initLat = @json(old('latitude', $event->latitude));
             const initLng = @json(old('longitude', $event->longitude));
-            const defaultCenter = [50.4501, 30.5234];
 
             const map = L.map('picker-map').setView(
-                initLat ? [parseFloat(initLat), parseFloat(initLng)] : defaultCenter, 12
+                initLat ? [parseFloat(initLat), parseFloat(initLng)] : [50.4501, 30.5234], 12
             );
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap'
             }).addTo(map);
 
-            setTimeout(() => map.invalidateSize(), 50);
+            new ResizeObserver(() => map.invalidateSize()).observe(document.getElementById('picker-map'));
 
             let marker = initLat
                 ? L.marker([parseFloat(initLat), parseFloat(initLng)]).addTo(map)
